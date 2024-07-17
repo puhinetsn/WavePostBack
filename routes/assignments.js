@@ -1,5 +1,5 @@
 const express = require("express");
-const { Assignment, AssignmentInfo } = require("../models");
+const { Assignment, AssignmentInfo } = require("../models/models");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -8,12 +8,13 @@ router.get("/", async (req, res) => {
     const page = req.query.page;
     const size = req.query.size;
     const filter = {};
-    if (worker !== null) {
+    if (worker !== undefined) {
         filter['worker.lastName'] = new RegExp('^' + worker, 'i');
-    } else if (department !== null) {
+    }
+    if (department !== undefined) {
         filter['departmentId'] = department;
     }
-    const workerAssignments = await Assignment.find(filter).limit(size).skip(page * size);
+    const workerAssignments = await AssignmentInfo.find(filter).limit(size).skip(page * size);
 
     return res.status(200).json({
         res: workerAssignments,
