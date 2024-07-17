@@ -1,13 +1,16 @@
 const express = require("express");
-const { Assignment, Worker } = require("../models");
+const { Worker, AssignmentInfo } = require("../models/models");
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
-router.get("/:id/assignments", async (req, res) => {
-    const { id } = req.params;
+router.get("/assignments", async (req, res) => {
+    const cookie = req.cookies['jwt']
+    const claims = jwt.verify(cookie, 'secret')
+
     const page = req.query.page;
     const size = req.query.size;
-    const filter = {'workers._id': id};
-    const workerAssignments = await Assignment.find(filter).limit(size).skip(page * size);
+    const filter = {'workers._id':  claims._id};
+    const workerAssignments = await AssignmentInfo.find(filter).limit(size).skip(page * size);
 
     return res.status(200).json({
         res: workerAssignments,
@@ -15,10 +18,12 @@ router.get("/:id/assignments", async (req, res) => {
     });
 });
 
-router.post("/", async (req, res) => {
-    const newWorker = new Worker({...req.body});
-    const insertedWorker = await newWorker.save();
-    return res.status(201).json(insertedWorker);
-});
+router.get('/', async (req, res) => {
+    const cookie = req.cookies['jwt']
+    const claims = jwt.verify(cookie, 'secret')
+    const user = await Worker.findOne({_id: claims._id});
 
+    const {password, ...data} = await user.toJSON()
+    return res.send(data);
+})
 module.exports = router
