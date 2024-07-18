@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-
+const { specs, swaggerUi } = require('./swagger');
 const  restrictAccess  = require('./routes/security');
 const app = express();
 
@@ -11,6 +11,8 @@ app.use(cors({
     credentials: true,
     origin: 'http://localhost:4200'
 }))
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
 
 app.use(express.json());
 const port = 3000;
@@ -29,8 +31,6 @@ app.use('/api/assignments', restrictAccess('Admin'), assignmentsRouter);
 
 const authRouter = require('./routes/auth');
 app.use('/api/auth', authRouter);
-
-
 
 const uri = "mongodb+srv://puhinetsn82:pQfIEYc31Ykj3kFD@clusterpuhinets.hjgmsud.mongodb.net/wavepost?retryWrites=true&w=majority&appName=ClusterPuhinets";
 mongoose.connect(uri);
