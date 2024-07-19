@@ -19,7 +19,7 @@ const restrictAccess = (...roles) => {
             const user = await Worker.findOne({_id: claims._id})
 
             if (!roles.includes(user.position)) {
-                return res.status(401).send({
+                return res.status(403).send({
                     message: "User don't have the required role"
                 })
             }
