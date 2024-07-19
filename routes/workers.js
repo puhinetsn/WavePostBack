@@ -112,9 +112,32 @@ router.get("/assignments", async (req, res) => {
 router.get('/', async (req, res) => {
     const cookie = req.cookies['jwt'];
     const claims = jwt.verify(cookie, 'secret');
-    const user = await Worker.findOne({_id: claims._id});
+    const id = claims._id;
 
-    const {password, ...data} = await user.toJSON();
+    const bonus = await AssignmentInfo.aggregate([
+            {
+                $match: {
+                    'workers._id': new mongoose.Types.ObjectId(id),
+                    $expr: {
+                        $and: [
+                            {$eq: [{$year: '$startDate'}, new Date().getFullYear()]},
+                            {$eq: [{$month: '$startDate'}, new Date().getMonth() + 1]}
+                        ]
+                    }
+                }
+            },
+            {$group: {_id: null, sum: {$sum: $type.payment}}}
+        ]
+    );
+
+    const user = await Worker.findOne({_id: id}).lean();
+    if (bonus.length) {
+        user.bonus = bonus[0].sum;
+    } else {
+        user.bonus = 0;
+    }
+
+    const {password, ...data} = user;
     return res.send(data);
 });
 
