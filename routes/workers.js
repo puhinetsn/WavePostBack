@@ -2,6 +2,7 @@ const express = require("express");
 const { Worker, AssignmentInfo } = require("../models/models");
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ router.get('/', async (req, res) => {
                     }
                 }
             },
-            {$group: {_id: null, sum: {$sum: $type.payment}}}
+            {$group: {_id: null, sum: {$sum: '$type.payment'}}}
         ]
     );
 
