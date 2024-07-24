@@ -1,8 +1,8 @@
 const express = require("express");
-const { Worker, AssignmentInfo } = require("../models/models");
+const {Worker, AssignmentInfo} = require("../models/models");
 const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
 const router = express.Router();
-const mongoose = require('mongoose');
 
 /**
  * @swagger
@@ -65,10 +65,41 @@ const mongoose = require('mongoose');
 
 /**
  * @swagger
+ * /workers/assignments/count:
+ *   get:
+ *     summary: Count of all worker's assignments
+ *     tags: [Workers]
+ *     responses:
+ *       200:
+ *         description: The count of all worker's assignment returned
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: number
+ *               example: 100
+ */
+
+/**
+ * @swagger
  * /workers/assignments:
  *   get:
- *     summary: Get all tasks assigned to a specific post office employee
+ *     summary: Get all tasks assigned to a specific post office employee with pagination
  *     tags: [Workers]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: A page from with data is returned. Starts from 0
+ *         example: 0
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: A size of the page
+ *         example: 20
  *     responses:
  *       200:
  *         description: The list of employees assignments
@@ -95,18 +126,27 @@ const mongoose = require('mongoose');
  *               $ref: '#/components/schemas/Worker'
  */
 
+router.get("/assignments/count", async (req, res) => {
+    const cookie = req.cookies['jwt'];
+    const claims = jwt.verify(cookie, 'secret');
+    const count = await AssignmentInfo.countDocuments( {'workers._id': claims._id});
+
+    return res.json(count);
+});
+
 router.get("/assignments", async (req, res) => {
     const cookie = req.cookies['jwt'];
     const claims = jwt.verify(cookie, 'secret');
 
     const page = req.query.page;
     const size = req.query.size;
-    const filter = {'workers._id':  claims._id};
-    const workerAssignments = await AssignmentInfo.find(filter).limit(size).skip(page * size);
+    const filter = {'workers._id': claims._id};
+    const workerAssignments = await AssignmentInfo.find(filter).sort({"startDate": -1}).limit(size).skip(page * size);
+    const count = await AssignmentInfo.countDocuments(filter);
 
     return res.status(200).json({
         res: workerAssignments,
-        hasNext: AssignmentInfo.countDocuments(filter) > ((page + 1) * size)
+        hasNext: count > ((page + 1) * size)
     });
 });
 
