@@ -178,7 +178,13 @@ router.post('/login', async (req, res) => {
 
 
 router.post('/logout', async (req, res) => {
-    res.cookie('jwt', '', {maxAge: 0})
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        httpOnly: true,
+        maxAge: 0,
+        sameSite: 'None',
+        secure: true
+    })
 
     res.send({
         message: 'Success'
