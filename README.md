@@ -29,7 +29,7 @@ For correct work run [Front-end](https://github.com/puhinetsn/WavePostFront) par
 ## Documentation
 If you want to read mode about this Express API, follow this URL:
 
-http://localhost:3000/api/api-docs/
+[https://wavepostback.onrender.com/api-docs/](https://wavepostback.onrender.com/api-docs/)
 
 ## Contacts
 If you have any questions about the project, please find attached my email address: 
