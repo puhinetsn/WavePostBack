@@ -12,7 +12,7 @@ const restrictAccess = (...roles) => {
 
             if (!claims) {
                 return res.status(401).send({
-                    message: 'User is not authenticated'
+                    message: 'Token is not valid'
                 })
             }
 
