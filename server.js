@@ -9,7 +9,7 @@ const app = express();
 app.use(cookieParser());
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:4200'
+    origin: 'https://puhinetsn.github.io/'
 }))
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
