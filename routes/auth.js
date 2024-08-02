@@ -180,7 +180,6 @@ router.post('/login', async (req, res) => {
 router.post('/logout', async (req, res) => {
     res.cookie('jwt', '', {
         httpOnly: true,
-        httpOnly: true,
         maxAge: 0,
         sameSite: 'None',
         secure: true
